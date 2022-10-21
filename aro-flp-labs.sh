@@ -39,8 +39,8 @@ usage() {
   echo -e ""
   echo -e "Lab Scenarios:"
   echo -e "\tLab 1: VNET route table sends traffic to NVA"
-  echo -e "\tLab 2: Egress network policies prevent outbound traffic from pods"
-  echo -e "\tLab 3: VNET NSG prevents all inbound traffic"
+  echo -e "\tLab 2: VNET NSG prevents all inbound traffic"
+  echo -e "\tLab 3: Egress network policies prevent outbound traffic from pods"
 }
 
 while true ;
