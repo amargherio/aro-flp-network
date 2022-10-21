@@ -20,13 +20,13 @@ lab2_build() {
     nsg_id=$(az network nsg create -g $RG_NAME --name aroNSG --location $LOCATION -o tsv --query id)
     az network nsg rule create --name verysecure \
         --nsg-name aroNSG \
-        --priority 100 \
+        --priority 101 \
         -g $RG_NAME \
         --destination-address-prefixes "*" \
         --destination-port-ranges "*" \
         --source-address-prefixes "*" \
         --source-port-ranges "*" \
-        --direction Outbound \
+        --direction Inbound \
         --access Deny \
         -o none
 
@@ -34,6 +34,7 @@ lab2_build() {
     az network vnet subnet update -n $MASTER_SUBNET \
         -g $RG_NAME \
         --vnet-name $VNET_NAME
+        --nsg $NSG_NAME
 }
 
 lab2_validate() {
