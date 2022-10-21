@@ -57,7 +57,7 @@ do
         -g|--resource-group)
             case "$2" in
                 "")
-                    RG_NAME="aro-lab"
+                    RG_NAME="aro-flp-network"
                     shift 2
                     ;;
                 *)
@@ -163,9 +163,14 @@ lab3_logic() {
 #### Time to party - let's set this up for the right lab scenario and call out to the right stuff
 case $LAB_SCENARIO in
     1)
+        RG_NAME="$RG_NAME-lab1"
         lab1_logic;;
     2)
+        RG_NAME="$RG_NAME-lab2"
         lab2_logic;;
+    3)
+        RG_NAME="$RG_NAME-lab3"
+        lab3_logic;;
     *)
         echo -e "Error: Invalid lab number provided. Run with --help for a scenario list."
         exit 1
