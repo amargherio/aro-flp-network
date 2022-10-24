@@ -8,6 +8,12 @@ RUN apt-get update && apt-get install bash-completion apt-transport-https gnupg 
     && apt-get update && apt-get install -y kubectl azure-cli \
     && apt-get clean all
 
+# Install OC CLI
+RUN curl -L https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz -o /tmp/openshift-client.tar.gz \
+    && tar xf /tmp/openshift-client.tar.gz -C /tmp/oc \
+    && mv /tmp/oc/oc /usr/local/bin \
+    && chmod +x /usr/local/bin/oc
+
 COPY ./bashrc /root/.bashrc
 
 COPY ./lab_binaries/* /usr/local/bin/
