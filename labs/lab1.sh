@@ -9,6 +9,7 @@ FW_PIP_CONFIG="fw-pip-config"
 
 
 lab1_build() {
+    echo -e "*** Starting the build for lab scenario 1!"
     build_common_infra
 
     # Build our (not really) insecure ARO cluster
@@ -62,19 +63,22 @@ lab1_build() {
         --next-hop-ip-address $fw_internal_ip
    
 
-    # Assign it to the master subnet
+    # Assign it to the worker subnet
     az network vnet subnet update -n $WORKER_SUBNET \
         -g $RG_NAME \
         --vnet-name $VNET_NAME
         --route-table $RT_NAME
 
+    echo -e "*** Lab number 1 deployment has finished. There's some really odd connectivity issues when apps in this cluster try to send traffic out..."
+
 }
 
 lab1_validate() {
+    echo -e "*** Starting validation of lab scenario 3..."
     # Validation will consist of removing the default route from the route table.
     rt_id=$(az network vnet subnet show -g $RG_NAME --vnet-name $VNET_NAME -n $WORKER_SUBNET --query "routeTable.id" -o tsv)
     if [ $? -gt 0  ]; then
-        echo -e "Unable to retrieve the subnet details used by the worker nodes."
+        echo -e "*** Unable to retrieve the subnet details used by the worker nodes."
         return 1
     fi
 
@@ -82,9 +86,9 @@ lab1_validate() {
     # the next hop address is the same as the internal IP of the firewall, but we won't
     # do that yet.
     if [ -z $rt_id ]; then
-        echo -e "The route table preventing worker connectivity has been removed. Well done!"
+        echo -e "*** The route table preventing worker connectivity has been removed. Well done!"
         return 0
     else
-        echo -e "The outbound connectivity from the worker nodes is still broken - keep trying..."
+        echo -e "*** The outbound connectivity from the worker nodes is still broken - keep trying..."
     fi
 }

@@ -3,6 +3,7 @@ MASTER_SUBNET="master-subnet"
 WORKER_SUBNET="worker-subnet"
 
 lab3_build() {
+    echo -e "*** Starting the build for lab scenario 3!"
     build_common_infra
 
     az aro create -g $RG_NAME \
@@ -15,6 +16,7 @@ lab3_build() {
 
     pass=$(az aro list-credentials -g $RG_NAME -n $ARO_NAME --query kubeadminPassword -o tsv)
     apiServer=$(az aro show -g $RG_NAME -n $ARO_NAME --query apiserverProfile.url -o tsv)
+    apiServerIp=$(az aro show -g $RG_NAME -n $ARO_NAME --query apiserverProfile.address -o tsv)
 
     oc login $apiServer -u kubeadmin -p $pass
 
@@ -105,16 +107,33 @@ metadata:
 spec:
   egress:
     - to:
-        cidrSelector: <<<REPLACE_WITH_IP>>>
+        cidrSelector: $apiServerIp
       type: Allow
     - to:
         cidrSelector: 0.0.0.0/0
       type: Deny
 EOF
 
-    echo -e "Lab number 3 deployment has finished. For some reason, the pods within the default namespace aren't accessible..."
+    echo -e "*** Lab number 3 deployment has finished. For some reason, the pods within the default namespace aren't accessible..."
 }
 
 lab3_validate() {
+  echo -e "Beginning validation for lab scenario 3..."
 
+  pass=$(az aro list-credentials -g $RG_NAME -n $ARO_NAME --query kubeadminPassword -o tsv)
+  apiServer=$(az aro show -g $RG_NAME -n $ARO_NAME --query apiserverProfile.url -o tsv)
+
+  oc login $apiServer -u kubeadmin -p $pass
+
+  enp_name=$(oc get egressnetworkpolicy -n default network-security-baseline -o jsonpath='{.metadata.name}')
+  if [ $? -gt 0 ]; then
+    echo -e "The restricting network policy has been removed - great job!"
+    echo -e ""
+    echo -e "You've completed this lab scenario. Feel free to delete the resource group for this lab to clean up your ARO cluster and related resources!"
+    
+    return 0
+  else
+    echo -e "Network traffic is still being restricted in the default namespace - please try again."
+    return 1
+  fi
 }
