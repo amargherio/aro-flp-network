@@ -1,7 +1,7 @@
 build_common_infra() {
     # Create the RG
     echo -e "***** Creating the resource group and vnet..."
-    az group create -n "$RG_NAME" -l $LOCATION -o tsv --query name
+    az group create -n "$RG_NAME" -l $LOCATION -o none
 
     az network vnet create -g $RG_NAME \
         -n $VNET_NAME \
@@ -13,14 +13,12 @@ build_common_infra() {
         --name $MASTER_SUBNET \
         --address-prefixes 172.16.0.0/27 \
         --service-endpoints Microsoft.ContainerRegistry \
-        --location $LOCATION \
         --output none
     az network vnet subnet create -g $RG_NAME \
         --vnet-name $VNET_NAME \
         --name $WORKER_SUBNET \
-        --address-prefixes 172.16.0.0/27 \
+        --address-prefixes 172.16.1.0/27 \
         --service-endpoints Microsoft.ContainerRegistry \
-        --location $LOCATION \
         --output none
 
     # Update the master subnet to disable private link network policies
@@ -29,12 +27,14 @@ build_common_infra() {
         --vnet-name $VNET_NAME \
         --disable-private-link-service-network-policies true \
         --output none
+    
+    sleep 30
 }
 
 debug_vars() {
     echo -e "**VARS CONFIGURED**"
     echo -e "LOCATION: $LOCATION"
-    echo -e "POSTFIX: $POSTFIX"
+    #echo -e "POSTFIX: $POSTFIX"
     echo -e "RG_NAME: $RG_NAME"
     echo -e "ARO_NAME: $ARO_NAME"
     echo -e "LAB_SCENARIO: $LAB_SCENARIO"

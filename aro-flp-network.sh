@@ -11,9 +11,9 @@
 set -uo pipefail
 
 LOCATION="centralus"
-POSTFIX=$(LC_ALL=C tr -cd "a-z0-9" < /dev/urandom | tr -dc '[:alnum:]' | fold -w 6 | head -n 1)
-RG_NAME=""
-ARO_NAME=""
+#POSTFIX=$(LC_ALL=C tr -cd "a-z0-9" < /dev/urandom | tr -dc '[:alnum:]' | fold -w 6 | head -n 1)
+RG_NAME="aro-flp-network"
+ARO_NAME="flp-network"
 LAB_SCENARIO=""
 USER_ALIAS=""
 VERSION="1.0.0"
@@ -57,7 +57,6 @@ do
         -g|--resource-group)
             case "$2" in
                 "")
-                    RG_NAME="aro-flp-network"
                     shift 2
                     ;;
                 *)
@@ -68,7 +67,6 @@ do
         -n|--name)
             case "$2" in
                 "")
-                    ARO_NAME="aro-cluster"
                     shift 2
                     ;;
                 *)
@@ -111,10 +109,10 @@ do
             SHOULD_VALIDATE=1
             shift
             ;;
+        --)
+            shift; break ;;
         *)
-            echo -e "Error: Invalid argument supplied"
-            exit 1
-            ;;
+            echo -e "Error: invalid argument\n"; exit 3 ;;
     esac
 done
 
@@ -124,8 +122,11 @@ if [ -n "${USER_ALIAS}" ]; then
     ARO_NAME="$ARO_NAME-$USER_ALIAS"
 fi
 
+
+
 source ./common_funcs.sh
-debug_vars
+#debug_vars
+#exit 0
 
 lab1_logic() {
     az_login_check
@@ -164,12 +165,15 @@ lab3_logic() {
 case $LAB_SCENARIO in
     1)
         RG_NAME="$RG_NAME-lab1"
+        ARO_NAME="$ARO_NAME-l1"
         lab1_logic;;
     2)
         RG_NAME="$RG_NAME-lab2"
+        ARO_NAME="$ARO_NAME-l2"
         lab2_logic;;
     3)
         RG_NAME="$RG_NAME-lab3"
+        ARO_NAME="$ARO_NAME-l3"
         lab3_logic;;
     *)
         echo -e "Error: Invalid lab number provided. Run with --help for a scenario list."
