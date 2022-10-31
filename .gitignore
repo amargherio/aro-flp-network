@@ -4,4 +4,4 @@
 tmp/
 
 *.json
-aro-lab-build.sh
+lab_binaries/

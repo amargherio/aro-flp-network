@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 # "-l|--lab" Lab scenario to deploy
 # "-r|--region" region to deploy the resources

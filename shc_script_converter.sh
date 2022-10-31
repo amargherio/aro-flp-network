@@ -1,7 +1,7 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 SHC_STATUS=$(which shc > /dev/null; echo $?)
-if [ SHC_STATUS -ne 0 ]; then
+if [ $SHC_STATUS -ne 0 ]; then
     echo -e "\nError: missing shc binary..."
     exit 4
 fi
