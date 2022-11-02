@@ -6,6 +6,7 @@ lab3_build() {
     echo -e "*** Starting the build for lab scenario 3!"
     build_common_infra
 
+    echo -e "***** Building our ARO lab cluster - this could take up to 30 minutes..."
     az aro create -g $RG_NAME \
         -n $ARO_NAME \
         --vnet $VNET_NAME \
@@ -14,10 +15,21 @@ lab3_build() {
         --location $LOCATION \
         --output none
 
+    if [ $? -gt 0 ]; then
+      echo -e "An error was encountered while attempting to build this lab scenario."
+      echo -e ""
+      echo -e "Please delete the resource group '$RG_NAME' and re-run the lab creation."
+      exit 1
+    fi
+
+    echo -e "***** Finishing a few more work items"
     pass=$(az aro list-credentials -g $RG_NAME -n $ARO_NAME --query kubeadminPassword -o tsv)
     apiServer=$(az aro show -g $RG_NAME -n $ARO_NAME --query apiserverProfile.url -o tsv)
     apiServerIp=$(az aro show -g $RG_NAME -n $ARO_NAME --query apiserverProfile.address -o tsv)
 
+
+    echo -e "***** Finalizing the setup and configuration on the lab scenario"
+    sleep 120
     oc login $apiServer -u kubeadmin -p $pass
 
 cat <<EOF | oc apply -f &>/dev/null -
